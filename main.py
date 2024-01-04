@@ -1,19 +1,44 @@
 import random
+import unicodedata
+
 
 # Load the dictionary
-with open('dictionary.txt', 'r') as f: # Reads all the lines
+with open('dictionary.txt', 'r') as f:  # Reads all the lines
     words = f.read().splitlines()
 
+
 def get_word():
-    word = random.choice(words).upper() # Makes all upper case
+    word = strip_accents(random.choice(words)).upper()  # Makes all upper case
+
     return word
 
+def strip_accents(word: str):
+    """
+    Strip accents from a given string.
+
+    :param word: The string to strip accents from.
+    :return: The string without any accents.
+
+    Example:
+    >>> strip_accents("é")
+    'e'
+    >>> strip_accents("ç")
+    'c'
+    >>> strip_accents("ñ")
+    'n'
+
+    """
+    return ''.join(c for c in unicodedata.normalize('NFD', word)
+                   if unicodedata.category(c) != 'Mn')
+
 def display_word(word, guesses):
-    return ' '.join([letter if (i == 0 or i == len(word) - 1 or letter in guesses) else '_' for i, letter in enumerate(word)])
+    return ' '.join(
+        [letter if (i == 0 or i == len(word) - 1 or letter in guesses) else '_' for i, letter in enumerate(word)])
+
 
 def hangman():
     print("Welcome to Hangman!")
-    print("1: Single Player Mode") # Game modes
+    print("1: Single Player Mode")  # Game modes
     print("2: Two Player Mode")
     mode = input("Choose a mode (1 or 2): ")
 
@@ -39,7 +64,7 @@ def hangman():
 
     while errors < max_errors:
         guess = input("Guess a letter: ").upper()
-        if len(guess) != 1 or not guess.isalpha(): # Checks that they are all characters and not numbers or characters
+        if len(guess) != 1 or not guess.isalpha():  # Checks that they are all characters and not numbers or characters
             print("Please enter a single letter.")
             continue
 
@@ -59,5 +84,6 @@ def hangman():
             return
 
     print(f"Game over. The word was {word}. You made {errors} errors.")
+
 
 hangman()
